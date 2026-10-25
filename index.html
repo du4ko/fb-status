@@ -150,7 +150,7 @@ load();setInterval(load,5*60*1000);
 // Показва общата бройка уникални посетители от GoatCounter
 // (изисква "Allow adding visitor counts on your website" в настройките на GoatCounter).
 function showVisits() {
-  fetch('https://svobodanaslovoto.goatcounter.com/counter/TOTAL.json', { cache: 'no-store' })
+  fetch('https://svobodanaslovoto.goatcounter.com/counter/%2F.json', { cache: 'no-store' })
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(d => {
       console.log('GoatCounter отговор:', d);
