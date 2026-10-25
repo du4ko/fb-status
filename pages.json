@@ -104,6 +104,18 @@
           "avatar": "avatars/bunker-news.jpg"
         }
       ]
+    },
+    {
+      "id": "shtirlits-4",
+      "name": "Щирлиц 4.0",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61595901539283",
+          "name": "Щирлиц 4.0",
+          "added": "2026-10-25",
+          "avatar": "avatars/shtirlits.jpg"
+        }
+      ]
     }
   ]
 }
