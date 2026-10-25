@@ -140,6 +140,18 @@
           "avatar": "avatars/muhomorkov.jpg"
         }
       ]
+    },
+    {
+      "id": "supermemeto",
+      "name": "Supermemeto",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/supermemeto",
+          "name": "Supermemeto",
+          "added": "2026-10-25",
+          "avatar": "avatars/supermemeto.jpg"
+        }
+      ]
     }
   ]
 }
