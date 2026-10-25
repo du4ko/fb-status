@@ -116,6 +116,18 @@
           "avatar": "avatars/shtirlits.jpg"
         }
       ]
+    },
+    {
+      "id": "us-sr",
+      "name": "US-SR",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61574779495573",
+          "name": "US-SR",
+          "added": "2026-10-25",
+          "avatar": "avatars/us-sr.jpg"
+        }
+      ]
     }
   ]
 }
