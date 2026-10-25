@@ -92,6 +92,18 @@
           "avatar": "avatars/bunkerina.jpg"
         }
       ]
+    },
+    {
+      "id": "bunker-news",
+      "name": "Бункер нюз",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61577398061794",
+          "name": "Бункер нюз",
+          "added": "2026-10-25",
+          "avatar": "avatars/bunker-news.jpg"
+        }
+      ]
     }
   ]
 }
