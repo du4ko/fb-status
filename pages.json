@@ -1,12 +1,24 @@
 {
   "outlets": [
     {
-      "id": "primer-satira",
-      "name": "Примерна сатирична медия",
-      "description": "Замени с реалните страници. Всяка нова страница след сваляне се добавя най-отгоре в списъка.",
+      "id": "kaputin",
+      "name": "Капутин",
       "pages": [
-        { "url": "https://www.facebook.com/example.satire.v2", "added": "2026-10-22", "note": "Нова страница след сваляне на първата" },
-        { "url": "https://www.facebook.com/example.satire", "added": "2026-09-01", "override": "down", "note": "Ръчно отбелязана като свалена" }
+        { "url": "https://www.facebook.com/profile.php?id=61572252076131", "name": "Капутин", "added": "2026-10-25" }
+      ]
+    },
+    {
+      "id": "kopeykin",
+      "name": "Копейкин",
+      "pages": [
+        { "url": "https://www.facebook.com/profile.php?id=61595671868875", "name": "Копейкин", "added": "2026-10-25" }
+      ]
+    },
+    {
+      "id": "bg-elves",
+      "name": "BG Elves",
+      "pages": [
+        { "url": "https://www.facebook.com/profile.php?id=61556411031966", "name": "BG Elves", "added": "2026-10-25" }
       ]
     }
   ]
