@@ -146,21 +146,17 @@ function render(){
 load();setInterval(load,5*60*1000);
 </script>
 <div class="visits" id="visits" hidden>👁 <b id="vcount">…</b> уникални посещения</div>
+<script data-goatcounter="https://svobodanaslovoto.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <script>
-// Брояч на уникални посетители чрез GoatCounter (без бисквитки).
-// Впиши кода от акаунта си, напр. 'fbstatus' за https://fbstatus.goatcounter.com
-const GOATCOUNTER = 'svobodanaslovoto';
-if (GOATCOUNTER) {
-  const sc = document.createElement('script');
-  sc.async = true; sc.src = 'https://gc.zgo.at/count.js';
-  sc.dataset.goatcounter = `https://${GOATCOUNTER}.goatcounter.com/count`;
-  document.body.appendChild(sc);
-  const showVisits = () => fetch(`https://${GOATCOUNTER}.goatcounter.com/counter/TOTAL.json`)
-    .then(r => r.ok ? r.json() : Promise.reject())
+// Показва общата бройка уникални посетители от GoatCounter
+// (изисква "Allow adding visitor counts on your website" в настройките на GoatCounter).
+function showVisits() {
+  fetch('https://svobodanaslovoto.goatcounter.com/counter/TOTAL.json')
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(d => { document.getElementById('vcount').textContent = d.count_unique || d.count; document.getElementById('visits').hidden = false; })
-    .catch(() => {});
-  setTimeout(showVisits, 1500);
+    .catch(e => console.log('GoatCounter брояч:', e));
 }
+setTimeout(showVisits, 2000);
 </script>
 </body>
 </html>
