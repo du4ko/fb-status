@@ -128,6 +128,18 @@
           "avatar": "avatars/us-sr.jpg"
         }
       ]
+    },
+    {
+      "id": "muhomorkov",
+      "name": "Мухоморков",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61552213135079",
+          "name": "Мухоморков",
+          "added": "2026-10-25",
+          "avatar": "avatars/muhomorkov.jpg"
+        }
+      ]
     }
   ]
 }
