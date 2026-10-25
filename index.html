@@ -169,6 +169,27 @@ function render(){
     <span class="meta">${fmt(e.ts)} · ${esc(e.url.replace(/^https?:\/\/(www\.)?/,''))}</span></div>`).join('')
     :'<div class="meta">Още няма промени.</div>';
 }
+// На телефон линковете към Facebook се опитват да отворят приложението; ако не стане — браузъра.
+const IS_MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const IN_FB_APP=/FBAN|FBAV|FB_IAB/i.test(navigator.userAgent);
+function fbAppUrl(url){
+  try{
+    const u=new URL(url), id=u.searchParams.get('id');
+    if(u.pathname==='/profile.php'&&id)return 'fb://profile/'+id;
+    return 'fb://facewebmodal/f?href='+encodeURIComponent(url);
+  }catch{return null}
+}
+document.addEventListener('click',e=>{
+  if(!IS_MOBILE||IN_FB_APP)return;
+  const a=e.target.closest('a[href*="facebook.com/"]'); if(!a)return;
+  const app=fbAppUrl(a.href); if(!app)return;
+  e.preventDefault();
+  const web=a.href; let left=false;
+  const onHide=()=>{left=true};
+  document.addEventListener('visibilitychange',onHide,{once:true});
+  window.location.href=app;
+  setTimeout(()=>{document.removeEventListener('visibilitychange',onHide); if(!left&&!document.hidden)window.open(web,'_blank')},1200);
+});
 load();setInterval(load,5*60*1000);
 </script>
 <div class="visits" id="visits" hidden>👁 <b id="vcount">…</b> посетители</div>
