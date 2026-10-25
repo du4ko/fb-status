@@ -1,7 +1,5 @@
 name: Проверка на страниците
 on:
-  schedule:
-    - cron: '7,27,47 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
