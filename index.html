@@ -41,6 +41,16 @@ a{color:var(--accent);word-break:break-all}
 .ava img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pinfo{flex:1;min-width:0}
 .page>.row{align-items:flex-start;flex-wrap:nowrap;gap:12px}
+.btn{font:inherit;padding:8px 14px;border-radius:8px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
+.btn:hover{background:var(--accent);color:var(--bg)}
+.btn.primary{background:var(--accent);color:var(--bg)}
+dialog{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:18px;width:min(460px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog h3{margin:0 0 6px}dialog label{display:block;font-size:.85rem;color:var(--muted);margin:10px 0 4px}
+dialog input,dialog textarea{width:100%}dialog textarea{min-height:70px;resize:vertical}
+.hp{position:absolute;left:-9999px}
+.dlg-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+#sgMsg{font-size:.85rem;margin-top:8px}
 .empty{color:var(--muted);padding:20px;text-align:center}
 footer{color:var(--muted);font-size:.8rem;padding-bottom:64px}
 .visits{position:fixed;right:16px;bottom:16px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.82rem;color:var(--muted);box-shadow:0 2px 10px rgba(0,0,0,.12)}
@@ -61,6 +71,7 @@ footer{color:var(--muted);font-size:.8rem;padding-bottom:64px}
       <option value="up">С активна страница</option>
       <option value="down">Без активна страница</option>
     </select>
+    <button type="button" id="suggestBtn" class="btn" hidden onclick="openSuggest()">＋ Предложи страница</button>
   </div>
   <div class="layout">
     <section id="list"></section>
@@ -162,6 +173,44 @@ function showVisits() {
     .catch(e => console.log('GoatCounter брояч:', e));
 }
 setTimeout(showVisits, 2000);
+</script>
+<dialog id="suggestDlg">
+  <form id="suggestForm" method="dialog">
+    <h3>Предложи страница</h3>
+    <div class="meta">Знаеш сатирична страница, която липсва? Пусни линка и след преглед ще я добавим.</div>
+    <label for="sgUrl">Линк към Facebook страницата *</label>
+    <input id="sgUrl" name="url" required placeholder="https://www.facebook.com/…" autocomplete="off">
+    <label for="sgName">Име (по желание)</label>
+    <input id="sgName" name="name" maxlength="80" autocomplete="off">
+    <label for="sgNote">Бележка (по желание), напр. „нова страница на …“</label>
+    <textarea id="sgNote" name="note" maxlength="300"></textarea>
+    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div id="sgMsg"></div>
+    <div class="dlg-actions">
+      <button type="button" class="btn" onclick="document.getElementById('suggestDlg').close()">Затвори</button>
+      <button type="submit" class="btn primary" id="sgSend">Изпрати</button>
+    </div>
+  </form>
+</dialog>
+<script>
+// Адресът на Cloudflare Worker-а. Докато е празен, бутонът е скрит.
+const SUGGEST_API = '';
+if (SUGGEST_API) document.getElementById('suggestBtn').hidden = false;
+function openSuggest(){ document.getElementById('sgMsg').textContent=''; document.getElementById('suggestDlg').showModal(); }
+document.getElementById('suggestForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, msg = document.getElementById('sgMsg'), btn = document.getElementById('sgSend');
+  btn.disabled = true; msg.style.color = 'var(--muted)'; msg.textContent = 'Изпращане…';
+  try {
+    const r = await fetch(SUGGEST_API.replace(/\/$/, '') + '/suggest', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(Object.fromEntries(new FormData(f))) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.ok) throw new Error(d.error || 'Грешка при изпращане.');
+    msg.style.color = 'var(--up)'; msg.textContent = 'Благодарим! Предложението ще бъде прегледано.';
+    f.reset(); setTimeout(() => document.getElementById('suggestDlg').close(), 2000);
+  } catch (err) { msg.style.color = 'var(--down)'; msg.textContent = err.message; }
+  btn.disabled = false;
+});
 </script>
 </body>
 </html>
