@@ -194,7 +194,7 @@ setTimeout(showVisits, 2000);
 </dialog>
 <script>
 // Адресът на Cloudflare Worker-а. Докато е празен, бутонът е скрит.
-const SUGGEST_API = 'https://fb-status-suggest.viktorstanchev7.workers.dev';
+const SUGGEST_API = 'https://fb-status-suggest.svobodanaslovoto.workers.dev';
 if (SUGGEST_API) document.getElementById('suggestBtn').hidden = false;
 function openSuggest(){ document.getElementById('sgMsg').textContent=''; document.getElementById('suggestDlg').showModal(); }
 document.getElementById('suggestForm').addEventListener('submit', async e => {
