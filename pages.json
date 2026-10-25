@@ -1,0 +1,13 @@
+{
+  "outlets": [
+    {
+      "id": "primer-satira",
+      "name": "Примерна сатирична медия",
+      "description": "Замени с реалните страници. Всяка нова страница след сваляне се добавя най-отгоре в списъка.",
+      "pages": [
+        { "url": "https://www.facebook.com/example.satire.v2", "added": "2026-10-22", "note": "Нова страница след сваляне на първата" },
+        { "url": "https://www.facebook.com/example.satire", "added": "2026-09-01", "override": "down", "note": "Ръчно отбелязана като свалена" }
+      ]
+    }
+  ]
+}
