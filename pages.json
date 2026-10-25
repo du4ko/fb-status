@@ -4,21 +4,57 @@
       "id": "kaputin",
       "name": "Капутин",
       "pages": [
-        { "url": "https://www.facebook.com/profile.php?id=61572252076131", "name": "Капутин", "added": "2026-10-25" }
+        {
+          "url": "https://www.facebook.com/profile.php?id=61572252076131",
+          "name": "Капутин",
+          "added": "2026-10-25"
+        }
       ]
     },
     {
       "id": "kopeykin",
       "name": "Копейкин",
       "pages": [
-        { "url": "https://www.facebook.com/profile.php?id=61595671868875", "name": "Копейкин", "added": "2026-10-25" }
+        {
+          "url": "https://www.facebook.com/profile.php?id=61595671868875",
+          "name": "Копейкин",
+          "added": "2026-10-25"
+        }
       ]
     },
     {
       "id": "bg-elves",
       "name": "BG Elves",
       "pages": [
-        { "url": "https://www.facebook.com/profile.php?id=61556411031966", "name": "BG Elves", "added": "2026-10-25" }
+        {
+          "url": "https://www.facebook.com/profile.php?id=61556411031966",
+          "name": "BG Elves",
+          "added": "2026-10-25"
+        }
+      ]
+    },
+    {
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61595732886875",
+          "added": "2026-10-25"
+        }
+      ]
+    },
+    {
+      "pages": [
+        {
+          "url": "https://www.facebook.com/Elves.BG.BG",
+          "added": "2026-10-25"
+        }
+      ]
+    },
+    {
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61596088401860",
+          "added": "2026-10-25"
+        }
       ]
     }
   ]
