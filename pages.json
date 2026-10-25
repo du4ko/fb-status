@@ -51,9 +51,13 @@
       "pages": [
         {
           "url": "https://www.facebook.com/Elves.BG.BG",
-          "added": "2026-10-25"
+          "added": "2026-10-25",
+          "avatar": "avatars/bg-elves-bg.jpg",
+          "name": "BG Elves.BG"
         }
-      ]
+      ],
+      "id": "bg-elves-bg",
+      "name": "BG Elves.BG"
     },
     {
       "pages": [
