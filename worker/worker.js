@@ -156,6 +156,24 @@ async function handleReport(req, env) {
   return json({ ok: true }, 200, h);
 }
 
+// Брояч на посетители: всеки посетител се брои веднъж на ден.
+// Пази се само еднопосочен хеш (IP + браузър + дата), без самия IP.
+const VISITS_BASE = 45; // посещенията, отчетени от GoatCounter преди този брояч
+async function handleVisit(req, env) {
+  const h = cors(req);
+  const day = new Date().toISOString().slice(0, 10);
+  const tag = (await hmac('visit:' + day, clientIp(req) + '|' + (req.headers.get('user-agent') || ''))).slice(0, 16);
+  let total = +(await env.SUGGESTIONS.get('visits:total')) || 0;
+  try {
+    if (!(await env.SUGGESTIONS.get(`v:${day}:${tag}`))) {
+      await env.SUGGESTIONS.put(`v:${day}:${tag}`, '1', { expirationTtl: 2 * 86400 });
+      total += 1;
+      await env.SUGGESTIONS.put('visits:total', String(total));
+    }
+  } catch { /* при достигнат лимит на KV просто показваме текущото число */ }
+  return json({ count: total + VISITS_BASE }, 200, { ...h, 'cache-control': 'no-store' });
+}
+
 async function handleLogin(req, env) {
   const ip = clientIp(req);
   const fails = +(await env.SUGGESTIONS.get(`fail:${ip}`)) || 0;
@@ -289,7 +307,8 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     try {
-      if (url.pathname === '/suggest' || url.pathname === '/report') {
+      if (url.pathname === '/visit' && req.method === 'POST') return await handleVisit(req, env);
+      if (url.pathname === '/suggest' || url.pathname === '/report' || url.pathname === '/visit') {
         if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
         if (req.method === 'POST') return await (url.pathname === '/suggest' ? handleSuggest : handleReport)(req, env);
       }

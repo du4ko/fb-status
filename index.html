@@ -179,20 +179,20 @@ window.goatcounter = { path: () => '/' };
 </script>
 <script data-goatcounter="https://svobodanaslovoto.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <script>
-// Показва бройката посетители от GoatCounter (изисква "Allow adding visitor counts" в настройките).
-// Пита и общия брой (TOTAL), и този за "/", и показва по-големия — TOTAL понякога се обновява със закъснение.
+// Брояч на посетители — брои се в нашия Cloudflare Worker (веднъж на ден на посетител).
+// GoatCounter остава само за подробната статистика в таблото.
 function showVisits() {
-  const n = v => parseInt(String(v ?? '0').replace(/[^0-9]/g, ''), 10) || 0;
-  const get = path => fetch(`https://svobodanaslovoto.goatcounter.com/counter/${path}.json`, { cache: 'no-store' })
-    .then(r => r.ok ? r.json() : {}).then(d => Math.max(n(d.count), n(d.count_unique))).catch(() => 0);
-  Promise.all([get('TOTAL'), get('%2F')]).then(([total, home]) => {
-    const v = Math.max(total, home);
-    if (!v) return;
-    document.getElementById('vcount').textContent = v.toLocaleString('bg-BG');
-    document.getElementById('visits').hidden = false;
-  });
+  if (typeof SUGGEST_API === 'undefined' || !SUGGEST_API) return;
+  fetch(SUGGEST_API.replace(/\/$/, '') + '/visit', { method: 'POST', cache: 'no-store' })
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(d => {
+      if (!d.count) return;
+      document.getElementById('vcount').textContent = Number(d.count).toLocaleString('bg-BG');
+      document.getElementById('visits').hidden = false;
+    })
+    .catch(e => console.log('Брояч:', e));
 }
-setTimeout(showVisits, 2000);
+setTimeout(showVisits, 500);
 </script>
 <dialog id="reportDlg">
   <form id="reportForm" method="dialog">
