@@ -213,6 +213,18 @@
           "avatar": "avatars/classical-cubyr.jpg"
         }
       ]
+    },
+    {
+      "id": "michelle-resistance",
+      "name": "Мишел от Съпротивата",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/MichelleoftheResistance",
+          "name": "Мишел от Съпротивата",
+          "added": "2026-10-25",
+          "avatar": "avatars/michelle.jpg"
+        }
+      ]
     }
   ]
 }
