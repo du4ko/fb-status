@@ -25,6 +25,12 @@ async function readJson(p, fallback) {
   try { return JSON.parse(await fs.readFile(p, 'utf8')); } catch { return fallback; }
 }
 
+function decode(s) {
+  return s.replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(+d))
+    .replace(/&quot;/g, '"').replace(/&#039;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+}
+
 function meta(html, prop) {
   const re = new RegExp(`<meta[^>]+property=["']${prop}["'][^>]*content=["']([^"']*)["']`, 'i');
   const re2 = new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]*property=["']${prop}["']`, 'i');
@@ -35,7 +41,7 @@ function meta(html, prop) {
 export function classify({ status, finalUrl, html }) {
   const title = ((html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '').trim();
   const ogTitle = meta(html, 'og:title');
-  const base = { http: status, title: ogTitle || title };
+  const base = { http: status, title: decode(ogTitle || title) };
 
   if (status === 404 || status === 410) return { ...base, state: 'down', reason: `HTTP ${status}` };
   if (DOWN_TITLES.some(r => r.test(title) || r.test(ogTitle)))
@@ -119,4 +125,4 @@ async function main() {
   await fs.writeFile(EVENTS, JSON.stringify(events.slice(-MAX_EVENTS), null, 1));
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();
