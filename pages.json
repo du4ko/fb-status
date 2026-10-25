@@ -177,6 +177,18 @@
           "avatar": "avatars/kaputinka.jpg"
         }
       ]
+    },
+    {
+      "id": "meme-team-bg-2",
+      "name": "Meme.Team.BG 2",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61574132597436",
+          "name": "Meme.Team.BG 2",
+          "added": "2026-10-25",
+          "avatar": "avatars/meme-team-bg-2.jpg"
+        }
+      ]
     }
   ]
 }
