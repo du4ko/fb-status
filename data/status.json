@@ -16,7 +16,6 @@
    "lastChecked": "2026-10-25T16:24:36.646Z",
    "lastReason": "пренасочване към вход",
    "lastHttp": 200,
-   "lastTitle": "Facebook",
    "lastUp": "2026-10-25T16:17:10.491Z",
    "firstSeenUp": "2026-10-25T16:17:10.491Z"
   },
@@ -36,7 +35,6 @@
    "lastChecked": "2026-10-25T16:24:36.646Z",
    "lastReason": "пренасочване към вход",
    "lastHttp": 200,
-   "lastTitle": "Facebook",
    "lastUp": "2026-10-25T16:17:10.491Z",
    "firstSeenUp": "2026-10-25T16:17:10.491Z"
   },
@@ -73,8 +71,7 @@
    "consecutiveDown": 0,
    "lastChecked": "2026-10-25T16:24:36.646Z",
    "lastReason": "пренасочване към вход",
-   "lastHttp": 200,
-   "lastTitle": "Facebook"
+   "lastHttp": 200
   },
   "https://www.facebook.com/Elves.BG.BG": {
    "state": "unknown",
@@ -87,8 +84,7 @@
    "consecutiveDown": 0,
    "lastChecked": "2026-10-25T16:24:36.646Z",
    "lastReason": "пренасочване към вход",
-   "lastHttp": 200,
-   "lastTitle": "Facebook"
+   "lastHttp": 200
   },
   "https://www.facebook.com/profile.php?id=61596088401860": {
    "state": "up",

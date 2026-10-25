@@ -52,14 +52,35 @@ export function classify({ status, finalUrl, html }) {
   if (status === 429 || status >= 500) return { ...base, state: 'unknown', reason: `HTTP ${status} (ограничение/грешка)` };
   if (/\/(login|checkpoint)/.test(finalUrl || '') && !ogTitle)
     return { ...base, state: 'unknown', reason: 'пренасочване към вход' };
+  if (/^facebook$/i.test(decode(ogTitle)))
+    return { ...base, title: '', image: '', state: 'unknown', reason: 'общ отговор от Facebook (ограничение)' };
   if (ogTitle) return { ...base, state: 'up', reason: 'намерено og:title' };
   return { ...base, state: 'unknown', reason: 'няма достатъчно сигнали' };
 }
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+const UAS = [
+  UA,
+  'Mozilla/5.0 (compatible; Twitterbot/1.0)',
+  'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+];
+
+// Facebook понякога връща общ отговор — пробваме с друг user-agent преди да се откажем.
 async function probe(url) {
+  let last;
+  for (const [i, ua] of UAS.entries()) {
+    if (i) await sleep(4000);
+    last = await probeOnce(url, ua);
+    if (last.state !== 'unknown') return last;
+  }
+  return last;
+}
+
+async function probeOnce(url, ua) {
   try {
     const res = await fetch(url, {
-      headers: { 'user-agent': UA, 'accept-language': 'bg,en;q=0.8' },
+      headers: { 'user-agent': ua, 'accept-language': 'bg,en;q=0.8' },
       redirect: 'follow',
       signal: AbortSignal.timeout(20000),
     });
@@ -85,7 +106,6 @@ async function saveAvatar(pageUrl, imgUrl) {
   } catch { return null; }
 }
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 async function main() {
   const cfg = await readJson(CONFIG, { outlets: [] });
