@@ -6,13 +6,17 @@
     [
      "2026-10-25T16:17:10.491Z",
      "up"
+    ],
+    [
+     "2026-10-25T16:24:36.646Z",
+     "unknown"
     ]
    ],
    "consecutiveDown": 0,
-   "lastChecked": "2026-10-25T16:17:10.491Z",
-   "lastReason": "намерено og:title",
+   "lastChecked": "2026-10-25T16:24:36.646Z",
+   "lastReason": "пренасочване към вход",
    "lastHttp": 200,
-   "lastTitle": "&#x41a;&#x430;&#x43f;&#x443;&#x442;&#x438;&#x43d;",
+   "lastTitle": "Facebook",
    "lastUp": "2026-10-25T16:17:10.491Z",
    "firstSeenUp": "2026-10-25T16:17:10.491Z"
   },
@@ -22,13 +26,17 @@
     [
      "2026-10-25T16:17:10.491Z",
      "up"
+    ],
+    [
+     "2026-10-25T16:24:36.646Z",
+     "unknown"
     ]
    ],
    "consecutiveDown": 0,
-   "lastChecked": "2026-10-25T16:17:10.491Z",
-   "lastReason": "намерено og:title",
+   "lastChecked": "2026-10-25T16:24:36.646Z",
+   "lastReason": "пренасочване към вход",
    "lastHttp": 200,
-   "lastTitle": "&#x41a;&#x43e;&#x43f;&#x435;&#x439;&#x43a;&#x438;&#x43d;",
+   "lastTitle": "Facebook",
    "lastUp": "2026-10-25T16:17:10.491Z",
    "firstSeenUp": "2026-10-25T16:17:10.491Z"
   },
@@ -38,16 +46,68 @@
     [
      "2026-10-25T16:17:10.491Z",
      "up"
+    ],
+    [
+     "2026-10-25T16:24:36.646Z",
+     "up"
     ]
    ],
    "consecutiveDown": 0,
-   "lastChecked": "2026-10-25T16:17:10.491Z",
+   "lastChecked": "2026-10-25T16:24:36.646Z",
    "lastReason": "намерено og:title",
    "lastHttp": 200,
    "lastTitle": "BG elves",
-   "lastUp": "2026-10-25T16:17:10.491Z",
-   "firstSeenUp": "2026-10-25T16:17:10.491Z"
+   "lastUp": "2026-10-25T16:24:36.646Z",
+   "firstSeenUp": "2026-10-25T16:17:10.491Z",
+   "avatar": "data/avatars/6f03a5c5af60.jpg",
+   "avatarAt": "2026-10-25T16:24:36.646Z"
+  },
+  "https://www.facebook.com/profile.php?id=61595732886875": {
+   "state": "unknown",
+   "history": [
+    [
+     "2026-10-25T16:24:36.646Z",
+     "unknown"
+    ]
+   ],
+   "consecutiveDown": 0,
+   "lastChecked": "2026-10-25T16:24:36.646Z",
+   "lastReason": "пренасочване към вход",
+   "lastHttp": 200,
+   "lastTitle": "Facebook"
+  },
+  "https://www.facebook.com/Elves.BG.BG": {
+   "state": "unknown",
+   "history": [
+    [
+     "2026-10-25T16:24:36.646Z",
+     "unknown"
+    ]
+   ],
+   "consecutiveDown": 0,
+   "lastChecked": "2026-10-25T16:24:36.646Z",
+   "lastReason": "пренасочване към вход",
+   "lastHttp": 200,
+   "lastTitle": "Facebook"
+  },
+  "https://www.facebook.com/profile.php?id=61596088401860": {
+   "state": "up",
+   "history": [
+    [
+     "2026-10-25T16:24:36.646Z",
+     "up"
+    ]
+   ],
+   "consecutiveDown": 0,
+   "lastChecked": "2026-10-25T16:24:36.646Z",
+   "lastReason": "намерено og:title",
+   "lastHttp": 200,
+   "lastTitle": "НРБ - Ново началo",
+   "avatar": "data/avatars/915869df802a.jpg",
+   "avatarAt": "2026-10-25T16:24:36.646Z",
+   "lastUp": "2026-10-25T16:24:36.646Z",
+   "firstSeenUp": "2026-10-25T16:24:36.646Z"
   }
  },
- "generatedAt": "2026-10-25T16:17:10.491Z"
+ "generatedAt": "2026-10-25T16:24:36.646Z"
 }
