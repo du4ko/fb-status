@@ -80,6 +80,17 @@
           "avatar": "avatars/zelenata-chorapchitsa.jpg"
         }
       ]
+    },
+    {
+      "id": "bunkerina",
+      "name": "Бункерина",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61583325639493",
+          "added": "2026-10-25",
+          "name": "Бункерина"
+        }
+      ]
     }
   ]
 }
