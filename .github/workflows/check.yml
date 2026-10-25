@@ -3,6 +3,9 @@ on:
   schedule:
     - cron: '*/20 * * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['pages.json', 'check.mjs', '.github/workflows/check.yml']
 permissions:
   contents: write
 concurrency:
