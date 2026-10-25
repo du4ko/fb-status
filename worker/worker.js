@@ -130,6 +130,32 @@ async function handleSuggest(req, env) {
   return json({ ok: true }, 200, h);
 }
 
+const REPORT_REASONS = { down: 'Свалена, но пише „Активна“', wrong: 'Грешно име или снимка', notsatire: 'Не е сатирична', personal: 'Личен профил', other: 'Друго' };
+const REPORT_LIMIT_PER_HOUR = 10;
+
+async function handleReport(req, env) {
+  const h = cors(req);
+  let body;
+  try { body = await req.json(); } catch { return json({ error: 'Невалидна заявка.' }, 400, h); }
+  if (body.website) return json({ ok: true }, 200, h);
+  const url = normalizeFacebookUrl(body.url);
+  const reason = REPORT_REASONS[body.reason] ? body.reason : 'other';
+  if (!url) return json({ error: 'Невалидна страница.' }, 400, h);
+  const ip = clientIp(req);
+  if (await bump(env.SUGGESTIONS, `rlr:${ip}`, 3600) > REPORT_LIMIT_PER_HOUR)
+    return json({ error: 'Твърде много сигнали. Опитай пак след час.' }, 429, h);
+
+  const key = `r:${await hmac('report', url)}`;
+  const ipTag = (await hmac('ip', ip)).slice(0, 12); // само хеш, без реалния IP
+  const rec = (await env.SUGGESTIONS.get(key, 'json')) || { url, reports: [] };
+  if (!rec.reports.some(r => r.ip === ipTag && r.reason === reason)) {
+    rec.reports.push({ reason, note: clean(body.note, 300), at: new Date().toISOString(), ip: ipTag });
+    rec.reports = rec.reports.slice(-50);
+    await env.SUGGESTIONS.put(key, JSON.stringify(rec), { expirationTtl: 60 * 60 * 24 * 60 });
+  }
+  return json({ ok: true }, 200, h);
+}
+
 async function handleLogin(req, env) {
   const ip = clientIp(req);
   const fails = +(await env.SUGGESTIONS.get(`fail:${ip}`)) || 0;
@@ -143,30 +169,58 @@ async function handleLogin(req, env) {
   return new Response(null, { status: 303, headers: { location: '/admin', 'set-cookie': cookie(await makeSession(env), SESSION_HOURS * 3600) } });
 }
 
-async function listSuggestions(env) {
+async function listSuggestions(env, prefix = 's:') {
   const out = [];
   let cursor;
   do {
-    const page = await env.SUGGESTIONS.list({ prefix: 's:', cursor });
+    const page = await env.SUGGESTIONS.list({ prefix, cursor });
     for (const k of page.keys) {
       const v = await env.SUGGESTIONS.get(k.name, 'json');
       if (v) out.push({ id: k.name, ...v });
     }
     cursor = page.list_complete ? null : page.cursor;
   } while (cursor);
-  return out.sort((a, b) => a.at.localeCompare(b.at));
+  return out.sort((a, b) => String(a.at || a.reports?.at(-1)?.at).localeCompare(String(b.at || b.reports?.at(-1)?.at)));
 }
 
 async function handleApi(req, env, action) {
   if (action === 'list') {
-    const [items, pages] = await Promise.all([listSuggestions(env), readPages(env)]);
+    const [items, reps, pages] = await Promise.all([listSuggestions(env), listSuggestions(env, 'r:'), readPages(env)]);
     const known = allUrls(pages.data);
+    const names = Object.fromEntries(pages.data.outlets.flatMap(o => o.pages.map(p => [p.url, p.name || o.name || ''])));
     return json({
       items: items.map(i => ({ ...i, alreadyListed: known.has(i.url) })),
+      reports: reps.map(r => ({ id: r.id, url: r.url, name: names[r.url] || '', listed: known.has(r.url),
+        reports: r.reports.map(x => ({ reason: REPORT_REASONS[x.reason] || x.reason, note: x.note, at: x.at })) })),
       outlets: pages.data.outlets.map(o => ({ id: o.id || o.pages[0]?.url, name: o.name || o.pages[0]?.name || o.pages[0]?.url })),
     });
   }
   const body = await req.json().catch(() => ({}));
+  if (action === 'dismiss' || action === 'removepage') {
+    const rep = body.id?.startsWith('r:') ? await env.SUGGESTIONS.get(body.id, 'json') : null;
+    if (!rep) return json({ error: 'Сигналът вече не съществува.' }, 404);
+    if (action === 'removepage') {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const { sha, data } = await readPages(env);
+        if (!allUrls(data).has(rep.url)) break;
+        data.outlets = data.outlets
+          .map(o => ({ ...o, pages: o.pages.filter(p => p.url !== rep.url) }))
+          .filter(o => o.pages.length);
+        try {
+          await gh(env, 'contents/pages.json', { method: 'PUT', body: JSON.stringify({
+            message: `Премахната страница: ${rep.url}`,
+            content: b64encodeUtf8(JSON.stringify(data, null, 2) + '\n'), sha, branch: BRANCH,
+          }) });
+          break;
+        } catch (e) {
+          if (String(e).includes('GitHub 409') && attempt < 2) continue;
+          throw e;
+        }
+      }
+    }
+    await env.SUGGESTIONS.delete(body.id);
+    return json({ ok: true });
+  }
   const item = body.id?.startsWith('s:') ? await env.SUGGESTIONS.get(body.id, 'json') : null;
   if (!item) return json({ error: 'Предложението вече не съществува.' }, 404);
 
@@ -210,9 +264,9 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     try {
-      if (url.pathname === '/suggest') {
+      if (url.pathname === '/suggest' || url.pathname === '/report') {
         if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
-        if (req.method === 'POST') return await handleSuggest(req, env);
+        if (req.method === 'POST') return await (url.pathname === '/suggest' ? handleSuggest : handleReport)(req, env);
       }
       if (url.pathname === '/admin' && req.method === 'GET') return new Response(ADMIN_HTML, {
         headers: { 'content-type': 'text/html; charset=utf-8', 'x-frame-options': 'DENY', 'cache-control': 'no-store', 'referrer-policy': 'no-referrer' },
@@ -220,7 +274,7 @@ export default {
       if (url.pathname === '/admin/login' && req.method === 'POST') return await handleLogin(req, env);
       if (url.pathname === '/admin/logout' && req.method === 'POST')
         return new Response(null, { status: 303, headers: { location: '/admin', 'set-cookie': cookie('', 0) } });
-      const m = url.pathname.match(/^\/admin\/api\/(list|approve|reject)$/);
+      const m = url.pathname.match(/^\/admin\/api\/(list|approve|reject|dismiss|removepage)$/);
       if (m) {
         if (!(await isAdmin(req, env))) return json({ error: 'auth' }, 401);
         if (m[1] !== 'list' && (req.method !== 'POST' || !(req.headers.get('content-type') || '').includes('application/json')))
@@ -229,7 +283,7 @@ export default {
       }
       return new Response('Not found', { status: 404 });
     } catch (e) {
-      return json({ error: 'Грешка: ' + e.message }, 500, url.pathname === '/suggest' ? cors(req) : {});
+      return json({ error: 'Грешка: ' + e.message }, 500, (url.pathname === '/suggest' || url.pathname === '/report') ? cors(req) : {});
     }
   },
 };
@@ -237,11 +291,11 @@ export default {
 // ---------- админ страница ----------
 const ADMIN_HTML = `<!doctype html>
 <html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow"><title>Предложения · админ</title>
+<meta name="robots" content="noindex,nofollow"><title>Админ панел</title>
 <style>
 :root{--bg:#2a2c30;--card:#34373c;--text:#ececec;--muted:#a3a7ae;--line:#45484e;--up:#2fb36b;--down:#e05555;--accent:#8fb0ff;color-scheme:dark}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:860px;margin:0 auto;padding:16px}h1{font-size:1.4rem}a{color:var(--accent);word-break:break-all}
+main{max-width:860px;margin:0 auto;padding:16px}h1{font-size:1.4rem}h2{font-size:1.1rem;margin:22px 0 10px}a{color:var(--accent);word-break:break-all}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
 .muted{color:var(--muted);font-size:.85rem}.warn{color:#f0c060;font-size:.85rem}
 input,select,button{font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:#2a2c30;color:var(--text)}
@@ -249,7 +303,7 @@ button{cursor:pointer}.ok{background:var(--up);border-color:var(--up);color:#fff
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.row input,.row select{flex:1;min-width:160px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 </style></head><body><main>
-<div class="top"><h1>Предложени страници</h1><form method="post" action="/admin/logout" id="lo" hidden><button>Изход</button></form></div>
+<div class="top"><h1>Админ панел</h1><form method="post" action="/admin/logout" id="lo" hidden><button>Изход</button></form></div>
 <div id="app" class="muted">Зареждане…</div>
 </main>
 <script>
@@ -266,24 +320,35 @@ async function load(){
   if(r.status===401)return login();
   const d=await r.json(); if(d.error){app.textContent=d.error;return}
   document.getElementById('lo').hidden=false;
-  if(!d.items.length){app.innerHTML='<div class="card muted">Няма нови предложения.</div>';return}
   const opts='<option value="">➕ Нова медия</option>'+d.outlets.map(o=>'<option value="'+esc(o.id)+'">към: '+esc(o.name)+'</option>').join('');
-  app.innerHTML='<p class="warn">Одобрявай само публични страници, не лични профили на хора.</p>'+d.items.map(i=>
+  let html='<h2>Сигнали ('+d.reports.length+')</h2>';
+  html+=d.reports.length?d.reports.map(r=>
+   '<div class="card" data-id="'+esc(r.id)+'">'+
+   '<b>'+esc(r.name||'Страница')+'</b> · <a href="'+esc(r.url)+'" target="_blank" rel="noopener noreferrer">'+esc(r.url)+'</a>'+
+   (r.listed?'':' <span class="warn">(вече не е в списъка)</span>')+
+   r.reports.map(x=>'<div class="muted">⚑ '+esc(x.reason)+' · '+new Date(x.at).toLocaleString('bg-BG')+(x.note?' — '+esc(x.note):'')+'</div>').join('')+
+   '<div class="row"><button class="ok" data-a="dismiss">Премахни сигнала</button>'+
+   (r.listed?'<button class="no" data-a="removepage" data-confirm="1">Махни страницата от сайта</button>':'')+
+   '<span class="muted st"></span></div></div>').join(''):'<div class="card muted">Няма сигнали.</div>';
+  html+='<h2>Предложения ('+d.items.length+')</h2>';
+  html+=d.items.length?'<p class="warn">Одобрявай само публични страници, не лични профили на хора.</p>'+d.items.map(i=>
    '<div class="card" data-id="'+esc(i.id)+'">'+
    '<a href="'+esc(i.url)+'" target="_blank" rel="noopener noreferrer">'+esc(i.url)+'</a>'+
    (i.alreadyListed?' <span class="warn">(вече е в списъка)</span>':'')+
    '<div class="muted">'+new Date(i.at).toLocaleString('bg-BG')+(i.note?' · '+esc(i.note):'')+'</div>'+
    '<div class="row"><input class="nm" placeholder="Име" value="'+esc(i.name)+'"><select class="ou">'+opts+'</select></div>'+
-   '<div class="row"><button class="ok" data-a="approve">Одобри</button><button class="no" data-a="reject">Откажи</button><span class="muted st"></span></div></div>').join('');
+   '<div class="row"><button class="ok" data-a="approve">Одобри</button><button class="no" data-a="reject">Откажи</button><span class="muted st"></span></div></div>').join(''):'<div class="card muted">Няма нови предложения.</div>';
+  app.innerHTML=html;
 }
 app.addEventListener('click',async e=>{
   const b=e.target.closest('button[data-a]'); if(!b)return;
-  const c=b.closest('.card'), st=c.querySelector('.st');
+  if(b.dataset.confirm&&!confirm('Сигурен ли си, че искаш да махнеш тази страница от сайта?'))return;
+  const c=b.closest('.card'), st=c.querySelector('.st'), nm=c.querySelector('.nm'), ou=c.querySelector('.ou');
   c.querySelectorAll('button').forEach(x=>x.disabled=true); st.textContent='…';
   const r=await fetch('/admin/api/'+b.dataset.a,{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},
-    body:JSON.stringify({id:c.dataset.id,name:c.querySelector('.nm').value,outlet:c.querySelector('.ou').value})});
+    body:JSON.stringify({id:c.dataset.id,name:nm?nm.value:'',outlet:ou?ou.value:''})});
   const d=await r.json().catch(()=>({}));
-  if(d.ok){c.remove(); if(!app.querySelector('.card'))load()}
+  if(d.ok){load()}
   else{st.textContent=d.error||'Грешка';c.querySelectorAll('button').forEach(x=>x.disabled=false)}
 });
 load();

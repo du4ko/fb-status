@@ -40,6 +40,9 @@ a{color:var(--accent);word-break:break-all}
 .ava.up{box-shadow:0 0 0 2px var(--up)}.ava.down{box-shadow:0 0 0 2px var(--down)}.ava.down img{filter:grayscale(1);opacity:.6}
 .ava img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pinfo{flex:1;min-width:0}
+.rep{flex:none;align-self:flex-start;font:inherit;font-size:.78rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.rep:hover{border-color:var(--down);color:var(--down)}
+dialog select{width:100%}
 .page>.row{align-items:flex-start;flex-wrap:nowrap;gap:12px}
 .btn{font:inherit;padding:8px 14px;border-radius:8px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
 .btn:hover{background:var(--accent);color:var(--bg)}
@@ -123,10 +126,8 @@ function render(){
     return f==='all'||(f==='up'?hasUp:!hasUp);
   });
   document.getElementById('list').innerHTML=shown.length?shown.map(o=>{
-    const removed=o.pages.filter(p=>st(p.url).state==='down').length;
     return `<article class="outlet">
       <h2>${esc(oname(o))}</h2>
-      <div class="meta">${esc(o.description||'')}${o.description?' · ':''}${o.pages.length} страници, ${removed} недостъпни</div>
       ${o.pages.map(p=>{const s=st(p.url);const bars=(s.history||[]).slice(-60);
         return `<div class="page">
           <div class="row">
@@ -141,7 +142,8 @@ function render(){
             ${s.lastUp?`последно активна ${fmt(s.lastUp)} · `:''}
             ${s.lastChecked?`проверена ${fmt(s.lastChecked)}`:'още не е проверена'}
             ${p.note?`<br>${esc(p.note)}`:''}
-          </div></div></div>
+          </div></div>
+            ${SUGGEST_API?`<button type="button" class="rep" data-url="${esc(p.url)}" data-name="${esc(p.name||s.lastTitle||'')}" onclick="openReport(this)" title="Сигнализирай за проблем">⚑ Сигнал</button>`:''}</div>
           ${bars.length?`<div class="bars" title="последни проверки">${bars.map(([t,v])=>`<i class="${v}" title="${fmt(t)}: ${LABEL[v]}"></i>`).join('')}</div>`:''}
         </div>`}).join('')}
     </article>`}).join(''):'<div class="empty">Няма резултати.</div>';
@@ -174,6 +176,29 @@ function showVisits() {
 }
 setTimeout(showVisits, 2000);
 </script>
+<dialog id="reportDlg">
+  <form id="reportForm" method="dialog">
+    <h3>Сигнал за страница</h3>
+    <div class="meta" id="rpName"></div>
+    <input type="hidden" name="url" id="rpUrl">
+    <label for="rpReason">Какъв е проблемът?</label>
+    <select id="rpReason" name="reason">
+      <option value="down">Страницата е свалена, но тук пише „Активна“</option>
+      <option value="wrong">Грешно име или снимка</option>
+      <option value="notsatire">Не е сатирична страница</option>
+      <option value="personal">Това е личен профил на човек</option>
+      <option value="other">Друго</option>
+    </select>
+    <label for="rpNote">Подробности (по желание)</label>
+    <textarea id="rpNote" name="note" maxlength="300"></textarea>
+    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div id="rpMsg" style="font-size:.85rem;margin-top:8px"></div>
+    <div class="dlg-actions">
+      <button type="button" class="btn" onclick="document.getElementById('reportDlg').close()">Затвори</button>
+      <button type="submit" class="btn primary" id="rpSend">Изпрати</button>
+    </div>
+  </form>
+</dialog>
 <dialog id="suggestDlg">
   <form id="suggestForm" method="dialog">
     <h3>Предложи страница</h3>
@@ -196,6 +221,26 @@ setTimeout(showVisits, 2000);
 // Адресът на Cloudflare Worker-а. Докато е празен, бутонът е скрит.
 const SUGGEST_API = 'https://fb-status-suggest.svobodanaslovoto.workers.dev';
 if (SUGGEST_API) document.getElementById('suggestBtn').hidden = false;
+function openReport(b){
+  document.getElementById('rpUrl').value=b.dataset.url;
+  document.getElementById('rpName').textContent=b.dataset.name||b.dataset.url;
+  document.getElementById('rpMsg').textContent='';
+  document.getElementById('reportDlg').showModal();
+}
+document.getElementById('reportForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, msg = document.getElementById('rpMsg'), btn = document.getElementById('rpSend');
+  btn.disabled = true; msg.style.color = 'var(--muted)'; msg.textContent = 'Изпращане…';
+  try {
+    const r = await fetch(SUGGEST_API.replace(/\/$/, '') + '/report', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(Object.fromEntries(new FormData(f))) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.ok) throw new Error(d.error || 'Грешка при изпращане.');
+    msg.style.color = 'var(--up)'; msg.textContent = 'Благодарим! Сигналът ще бъде прегледан.';
+    f.reset(); setTimeout(() => document.getElementById('reportDlg').close(), 2000);
+  } catch (err) { msg.style.color = 'var(--down)'; msg.textContent = err.message; }
+  btn.disabled = false;
+});
 function openSuggest(){ document.getElementById('sgMsg').textContent=''; document.getElementById('suggestDlg').showModal(); }
 document.getElementById('suggestForm').addEventListener('submit', async e => {
   e.preventDefault();
