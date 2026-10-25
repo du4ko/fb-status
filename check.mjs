@@ -134,7 +134,12 @@ async function main() {
       if (result.http) rec.lastHttp = result.http;
       if (result.title) rec.lastTitle = result.title;
 
-      if (result.state === 'up' && result.image &&
+      // Ако Facebook не даде снимка (напр. пренасочи към вход), пробваме публичния адрес за профилна снимка.
+      if (!result.image && !rec.avatar && rec.state !== 'down') {
+        const id = new URL(url).searchParams.get('id') || new URL(url).pathname.split('/').filter(Boolean)[0];
+        if (id) result.image = `https://graph.facebook.com/${encodeURIComponent(id)}/picture?type=large`;
+      }
+      if (rec.state !== 'down' && result.image &&
           (!rec.avatar || Date.now() - new Date(rec.avatarAt || 0) > AVATAR_MAX_AGE)) {
         const saved = await saveAvatar(url, result.image);
         if (saved) { rec.avatar = saved; rec.avatarAt = now; }
