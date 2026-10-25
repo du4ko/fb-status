@@ -152,6 +152,18 @@
           "avatar": "avatars/supermemeto.jpg"
         }
       ]
+    },
+    {
+      "id": "matryoshkin",
+      "name": "Матрьошкин",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61581265213725",
+          "name": "Матрьошкин",
+          "added": "2026-10-25",
+          "avatar": "avatars/matryoshkin.jpg"
+        }
+      ]
     }
   ]
 }
