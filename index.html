@@ -43,7 +43,9 @@ a{color:var(--accent);word-break:break-all}
 .pinfo{flex:1;min-width:0}
 .page>.row{align-items:flex-start;flex-wrap:nowrap;gap:12px}
 .empty{color:var(--muted);padding:20px;text-align:center}
-footer{color:var(--muted);font-size:.8rem}
+footer{color:var(--muted);font-size:.8rem;padding-bottom:64px}
+.visits{position:fixed;right:16px;bottom:16px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.82rem;color:var(--muted);box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.visits b{color:var(--text)}
 </style>
 </head>
 <body>
@@ -142,6 +144,23 @@ function render(){
     :'<div class="meta">Още няма промени.</div>';
 }
 load();setInterval(load,5*60*1000);
+</script>
+<div class="visits" id="visits" hidden>👁 <b id="vcount">…</b> уникални посещения</div>
+<script>
+// Брояч на уникални посетители чрез GoatCounter (без бисквитки).
+// Впиши кода от акаунта си, напр. 'fbstatus' за https://fbstatus.goatcounter.com
+const GOATCOUNTER = '';
+if (GOATCOUNTER) {
+  const sc = document.createElement('script');
+  sc.async = true; sc.src = 'https://gc.zgo.at/count.js';
+  sc.dataset.goatcounter = `https://${GOATCOUNTER}.goatcounter.com/count`;
+  document.body.appendChild(sc);
+  const showVisits = () => fetch(`https://${GOATCOUNTER}.goatcounter.com/counter/TOTAL.json`)
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => { document.getElementById('vcount').textContent = d.count_unique || d.count; document.getElementById('visits').hidden = false; })
+    .catch(() => {});
+  setTimeout(showVisits, 1500);
+}
 </script>
 </body>
 </html>
