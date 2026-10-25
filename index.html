@@ -152,7 +152,7 @@ load();setInterval(load,5*60*1000);
 function showVisits() {
   fetch('https://svobodanaslovoto.goatcounter.com/counter/TOTAL.json')
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(d => { document.getElementById('vcount').textContent = d.count_unique || d.count; document.getElementById('visits').hidden = false; })
+    .then(d => { document.getElementById('vcount').textContent = d.count; document.getElementById('visits').hidden = false; })
     .catch(e => console.log('GoatCounter брояч:', e));
 }
 setTimeout(showVisits, 2000);
