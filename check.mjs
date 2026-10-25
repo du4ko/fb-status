@@ -136,7 +136,7 @@ async function main() {
       // 'unknown' не сменя потвърдения статус
 
       if (rec.state !== prev && prev !== undefined) {
-        events.push({ ts: now, outlet: outlet.id, url, from: prev, to: rec.state });
+        events.push({ ts: now, outlet: outlet.id || outlet.pages[0]?.url, url, from: prev, to: rec.state });
       }
       status.pages[url] = rec;
       console.log(`${rec.state.padEnd(7)} ${url}  (${result.reason})`);

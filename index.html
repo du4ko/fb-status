@@ -79,6 +79,8 @@ async function j(p,f){try{const r=await fetch(p+'?t='+Date.now());if(!r.ok)throw
 function dur(from){if(!from)return'';const h=Math.round((Date.now()-new Date(from))/36e5);return h<48?`${h} ч.`:`${Math.round(h/24)} дни`}
 let D={cfg:{outlets:[]},status:{pages:{}},events:[]};
 const st=url=>D.status.pages?.[url]||{state:'unknown',history:[]};
+const oid=o=>o.id||o.pages?.[0]?.url||'';
+const oname=o=>o.name||o.pages.map(p=>st(p.url).lastTitle).find(Boolean)||'Страница без име';
 
 async function load(){
   if(location.protocol==='file:'){
@@ -103,7 +105,7 @@ function render(){
   ].map(([v,l])=>`<div class="stat"><b>${esc(v)}</b><span>${l}</span></div>`).join('');
 
   const shown=outlets.filter(o=>{
-    const hay=(o.name+' '+(o.description||'')+' '+o.pages.map(p=>p.url).join(' ')).toLowerCase();
+    const hay=(oname(o)+' '+(o.description||'')+' '+o.pages.map(p=>p.url).join(' ')).toLowerCase();
     if(q&&!hay.includes(q))return false;
     const hasUp=o.pages.some(p=>st(p.url).state==='up');
     return f==='all'||(f==='up'?hasUp:!hasUp);
@@ -111,7 +113,7 @@ function render(){
   document.getElementById('list').innerHTML=shown.length?shown.map(o=>{
     const removed=o.pages.filter(p=>st(p.url).state==='down').length;
     return `<article class="outlet">
-      <h2>${esc(o.name)}</h2>
+      <h2>${esc(oname(o))}</h2>
       <div class="meta">${esc(o.description||'')}${o.description?' · ':''}${o.pages.length} страници, ${removed} недостъпни</div>
       ${o.pages.map(p=>{const s=st(p.url);const bars=(s.history||[]).slice(-60);
         return `<div class="page">
@@ -132,7 +134,7 @@ function render(){
         </div>`}).join('')}
     </article>`}).join(''):'<div class="empty">Няма резултати.</div>';
 
-  const names=Object.fromEntries(outlets.map(o=>[o.id,o.name]));
+  const names=Object.fromEntries(outlets.map(o=>[oid(o),oname(o)]));
   const ev=[...(D.events||[])].reverse().slice(0,40);
   document.getElementById('events').innerHTML=ev.length?ev.map(e=>`<div class="ev">
     <span class="badge b-${e.to}">${LABEL[e.to]||e.to}</span> <b>${esc(names[e.outlet]||e.outlet)}</b><br>
