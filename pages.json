@@ -39,9 +39,13 @@
       "pages": [
         {
           "url": "https://www.facebook.com/profile.php?id=61595732886875",
-          "added": "2026-10-25"
+          "added": "2026-10-25",
+          "avatar": "avatars/puylo.jpg",
+          "name": "Пуйло"
         }
-      ]
+      ],
+      "id": "puylo",
+      "name": "Пуйло"
     },
     {
       "pages": [
