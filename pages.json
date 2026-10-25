@@ -201,6 +201,18 @@
           "avatar": "avatars/artisbiomemes.jpg"
         }
       ]
+    },
+    {
+      "id": "classical-cubyr",
+      "name": "Класически ЦУБър",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/classical_cubyr1",
+          "name": "Класически ЦУБър",
+          "added": "2026-10-25",
+          "avatar": "avatars/classical-cubyr.jpg"
+        }
+      ]
     }
   ]
 }
