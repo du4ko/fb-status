@@ -54,13 +54,17 @@
     [
      "2026-10-25T20:01:02.066Z",
      "up"
+    ],
+    [
+     "2026-10-25T20:04:29.888Z",
+     "up"
     ]
    ],
    "consecutiveDown": 0,
-   "lastChecked": "2026-10-25T20:01:02.066Z",
+   "lastChecked": "2026-10-25T20:04:29.888Z",
    "lastReason": "намерено og:title",
    "lastHttp": 200,
-   "lastUp": "2026-10-25T20:01:02.066Z",
+   "lastUp": "2026-10-25T20:04:29.888Z",
    "firstSeenUp": "2026-10-25T16:17:10.491Z",
    "lastTitle": "Капутин",
    "avatar": "data/avatars/8f5d448ba97f.jpg",
@@ -120,13 +124,17 @@
     [
      "2026-10-25T20:01:02.066Z",
      "up"
+    ],
+    [
+     "2026-10-25T20:04:29.888Z",
+     "up"
     ]
    ],
    "consecutiveDown": 0,
-   "lastChecked": "2026-10-25T20:01:02.066Z",
+   "lastChecked": "2026-10-25T20:04:29.888Z",
    "lastReason": "намерено og:title",
    "lastHttp": 200,
-   "lastUp": "2026-10-25T20:01:02.066Z",
+   "lastUp": "2026-10-25T20:04:29.888Z",
    "firstSeenUp": "2026-10-25T16:17:10.491Z",
    "lastTitle": "Копейкин",
    "avatar": "data/avatars/ff3254ad4d68.jpg",
@@ -186,14 +194,18 @@
     [
      "2026-10-25T20:01:02.066Z",
      "up"
+    ],
+    [
+     "2026-10-25T20:04:29.888Z",
+     "up"
     ]
    ],
    "consecutiveDown": 0,
-   "lastChecked": "2026-10-25T20:01:02.066Z",
+   "lastChecked": "2026-10-25T20:04:29.888Z",
    "lastReason": "намерено og:title",
    "lastHttp": 200,
    "lastTitle": "BG elves",
-   "lastUp": "2026-10-25T20:01:02.066Z",
+   "lastUp": "2026-10-25T20:04:29.888Z",
    "firstSeenUp": "2026-10-25T16:17:10.491Z",
    "avatar": "data/avatars/6f03a5c5af60.jpg",
    "avatarAt": "2026-10-25T16:24:36.646Z"
@@ -248,16 +260,20 @@
     [
      "2026-10-25T20:01:02.066Z",
      "up"
+    ],
+    [
+     "2026-10-25T20:04:29.888Z",
+     "up"
     ]
    ],
    "consecutiveDown": 0,
-   "lastChecked": "2026-10-25T20:01:02.066Z",
+   "lastChecked": "2026-10-25T20:04:29.888Z",
    "lastReason": "намерено og:title",
    "lastHttp": 200,
    "lastTitle": "Пуйло",
    "avatar": "data/avatars/92b087d2b0cb.jpg",
    "avatarAt": "2026-10-25T16:36:32.467Z",
-   "lastUp": "2026-10-25T20:01:02.066Z",
+   "lastUp": "2026-10-25T20:04:29.888Z",
    "firstSeenUp": "2026-10-25T16:36:32.467Z"
   },
   "https://www.facebook.com/Elves.BG.BG": {
@@ -310,16 +326,20 @@
     [
      "2026-10-25T20:01:02.066Z",
      "up"
+    ],
+    [
+     "2026-10-25T20:04:29.888Z",
+     "up"
     ]
    ],
    "consecutiveDown": 0,
-   "lastChecked": "2026-10-25T20:01:02.066Z",
+   "lastChecked": "2026-10-25T20:04:29.888Z",
    "lastReason": "намерено og:title",
    "lastHttp": 200,
    "lastTitle": "BG Elves.BG",
    "avatar": "data/avatars/c9a3b60c73a4.jpg",
    "avatarAt": "2026-10-25T16:36:32.467Z",
-   "lastUp": "2026-10-25T20:01:02.066Z",
+   "lastUp": "2026-10-25T20:04:29.888Z",
    "firstSeenUp": "2026-10-25T16:36:32.467Z"
   },
   "https://www.facebook.com/profile.php?id=61596088401860": {
@@ -372,18 +392,38 @@
     [
      "2026-10-25T20:01:02.066Z",
      "up"
+    ],
+    [
+     "2026-10-25T20:04:29.888Z",
+     "up"
     ]
    ],
    "consecutiveDown": 0,
-   "lastChecked": "2026-10-25T20:01:02.066Z",
+   "lastChecked": "2026-10-25T20:04:29.888Z",
    "lastReason": "намерено og:title",
    "lastHttp": 200,
    "lastTitle": "НРБ - Ново началo",
    "avatar": "data/avatars/915869df802a.jpg",
    "avatarAt": "2026-10-25T16:24:36.646Z",
-   "lastUp": "2026-10-25T20:01:02.066Z",
+   "lastUp": "2026-10-25T20:04:29.888Z",
    "firstSeenUp": "2026-10-25T16:24:36.646Z"
+  },
+  "https://www.facebook.com/profile.php?id=61595827321168": {
+   "state": "up",
+   "history": [
+    [
+     "2026-10-25T20:04:29.888Z",
+     "up"
+    ]
+   ],
+   "consecutiveDown": 0,
+   "lastChecked": "2026-10-25T20:04:29.888Z",
+   "lastReason": "намерено og:title",
+   "lastHttp": 200,
+   "lastTitle": "Зелената Чорапчица",
+   "lastUp": "2026-10-25T20:04:29.888Z",
+   "firstSeenUp": "2026-10-25T20:04:29.888Z"
   }
  },
- "generatedAt": "2026-10-25T20:01:02.066Z"
+ "generatedAt": "2026-10-25T20:04:29.888Z"
 }
