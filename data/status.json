@@ -1,0 +1,53 @@
+{
+ "pages": {
+  "https://www.facebook.com/profile.php?id=61572252076131": {
+   "state": "up",
+   "history": [
+    [
+     "2026-10-25T16:17:10.491Z",
+     "up"
+    ]
+   ],
+   "consecutiveDown": 0,
+   "lastChecked": "2026-10-25T16:17:10.491Z",
+   "lastReason": "намерено og:title",
+   "lastHttp": 200,
+   "lastTitle": "&#x41a;&#x430;&#x43f;&#x443;&#x442;&#x438;&#x43d;",
+   "lastUp": "2026-10-25T16:17:10.491Z",
+   "firstSeenUp": "2026-10-25T16:17:10.491Z"
+  },
+  "https://www.facebook.com/profile.php?id=61595671868875": {
+   "state": "up",
+   "history": [
+    [
+     "2026-10-25T16:17:10.491Z",
+     "up"
+    ]
+   ],
+   "consecutiveDown": 0,
+   "lastChecked": "2026-10-25T16:17:10.491Z",
+   "lastReason": "намерено og:title",
+   "lastHttp": 200,
+   "lastTitle": "&#x41a;&#x43e;&#x43f;&#x435;&#x439;&#x43a;&#x438;&#x43d;",
+   "lastUp": "2026-10-25T16:17:10.491Z",
+   "firstSeenUp": "2026-10-25T16:17:10.491Z"
+  },
+  "https://www.facebook.com/profile.php?id=61556411031966": {
+   "state": "up",
+   "history": [
+    [
+     "2026-10-25T16:17:10.491Z",
+     "up"
+    ]
+   ],
+   "consecutiveDown": 0,
+   "lastChecked": "2026-10-25T16:17:10.491Z",
+   "lastReason": "намерено og:title",
+   "lastHttp": 200,
+   "lastTitle": "BG elves",
+   "lastUp": "2026-10-25T16:17:10.491Z",
+   "firstSeenUp": "2026-10-25T16:17:10.491Z"
+  }
+ },
+ "generatedAt": "2026-10-25T16:17:10.491Z"
+}
