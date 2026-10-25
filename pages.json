@@ -164,6 +164,18 @@
           "avatar": "avatars/matryoshkin.jpg"
         }
       ]
+    },
+    {
+      "id": "kaputinka",
+      "name": "КаПуТинКа",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/profile.php?id=61595017746144",
+          "name": "КаПуТинКа",
+          "added": "2026-10-25",
+          "avatar": "avatars/kaputinka.jpg"
+        }
+      ]
     }
   ]
 }
