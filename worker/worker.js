@@ -130,7 +130,7 @@ async function handleSuggest(req, env) {
   return json({ ok: true }, 200, h);
 }
 
-const REPORT_REASONS = { down: 'Свалена, но пише „Активна“', wrong: 'Грешно име или снимка', notsatire: 'Не е сатирична', personal: 'Личен профил', other: 'Друго' };
+const REPORT_REASONS = { down: 'Свалена, но пише „Активна“', wrong: 'Грешно име или снимка', notsatire: 'Не е сатирична', personal: 'Личен профил', fake: 'Фалшив профил, представя се за друг', other: 'Друго' };
 const REPORT_LIMIT_PER_HOUR = 10;
 
 async function handleReport(req, env) {
