@@ -189,6 +189,18 @@
           "avatar": "avatars/meme-team-bg-2.jpg"
         }
       ]
+    },
+    {
+      "id": "artisbiomemes",
+      "name": "Занаятчийски биомемежи за холистични неомладежи",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/artisbiomemes",
+          "name": "Занаятчийски биомемежи за холистични неомладежи",
+          "added": "2026-10-25",
+          "avatar": "avatars/artisbiomemes.jpg"
+        }
+      ]
     }
   ]
 }
