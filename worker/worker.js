@@ -188,14 +188,39 @@ async function handleApi(req, env, action) {
     const [items, reps, pages] = await Promise.all([listSuggestions(env), listSuggestions(env, 'r:'), readPages(env)]);
     const known = allUrls(pages.data);
     const names = Object.fromEntries(pages.data.outlets.flatMap(o => o.pages.map(p => [p.url, p.name || o.name || ''])));
+    const marks = Object.fromEntries(pages.data.outlets.flatMap(o => o.pages.map(p => [p.url, { flag: p.flag || '', note: p.note || '' }])));
     return json({
       items: items.map(i => ({ ...i, alreadyListed: known.has(i.url) })),
-      reports: reps.map(r => ({ id: r.id, url: r.url, name: names[r.url] || '', listed: known.has(r.url),
+      reports: reps.map(r => ({ id: r.id, url: r.url, name: names[r.url] || '', listed: known.has(r.url), ...(marks[r.url] || { flag: '', note: '' }),
         reports: r.reports.map(x => ({ reason: REPORT_REASONS[x.reason] || x.reason, note: x.note, at: x.at })) })),
       outlets: pages.data.outlets.map(o => ({ id: o.id || o.pages[0]?.url, name: o.name || o.pages[0]?.name || o.pages[0]?.url })),
     });
   }
   const body = await req.json().catch(() => ({}));
+  if (action === 'mark') {
+    const rep = body.id?.startsWith('r:') ? await env.SUGGESTIONS.get(body.id, 'json') : null;
+    if (!rep) return json({ error: 'Сигналът вече не съществува.' }, 404);
+    const flag = clean(body.flag, 60), note = clean(body.note, 300);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { sha, data } = await readPages(env);
+      const page = data.outlets.flatMap(o => o.pages).find(p => p.url === rep.url);
+      if (!page) return json({ error: 'Страницата вече не е в списъка.' }, 404);
+      if (flag) page.flag = flag; else delete page.flag;
+      if (note) page.note = note; else delete page.note;
+      try {
+        await gh(env, 'contents/pages.json', { method: 'PUT', body: JSON.stringify({
+          message: `Маркирана страница: ${page.name || rep.url}${flag ? ' — ' + flag : ''}`,
+          content: b64encodeUtf8(JSON.stringify(data, null, 2) + '\n'), sha, branch: BRANCH,
+        }) });
+        break;
+      } catch (e) {
+        if (String(e).includes('GitHub 409') && attempt < 2) continue;
+        throw e;
+      }
+    }
+    if (body.keep !== true) await env.SUGGESTIONS.delete(body.id);
+    return json({ ok: true });
+  }
   if (action === 'dismiss' || action === 'removepage') {
     const rep = body.id?.startsWith('r:') ? await env.SUGGESTIONS.get(body.id, 'json') : null;
     if (!rep) return json({ error: 'Сигналът вече не съществува.' }, 404);
@@ -274,7 +299,7 @@ export default {
       if (url.pathname === '/admin/login' && req.method === 'POST') return await handleLogin(req, env);
       if (url.pathname === '/admin/logout' && req.method === 'POST')
         return new Response(null, { status: 303, headers: { location: '/admin', 'set-cookie': cookie('', 0) } });
-      const m = url.pathname.match(/^\/admin\/api\/(list|approve|reject|dismiss|removepage)$/);
+      const m = url.pathname.match(/^\/admin\/api\/(list|approve|reject|dismiss|removepage|mark)$/);
       if (m) {
         if (!(await isAdmin(req, env))) return json({ error: 'auth' }, 401);
         if (m[1] !== 'list' && (req.method !== 'POST' || !(req.headers.get('content-type') || '').includes('application/json')))
@@ -315,6 +340,7 @@ function login(){
   (err==='wrong'?'<p class="warn">Грешна парола.</p>':'')+(err==='blocked'?'<p class="warn">Твърде много опити. Опитай след 15 минути.</p>':'')+
   '<div class="row"><input type="password" name="password" placeholder="Парола" autofocus required><button class="ok">Вход</button></div></form>';
 }
+const FLAGS=['','Фалшив профил','Представя се за друг','Не е сатира','Личен профил','Свалена'];
 async function load(){
   const r=await fetch('/admin/api/list',{credentials:'same-origin'});
   if(r.status===401)return login();
@@ -327,6 +353,9 @@ async function load(){
    '<b>'+esc(r.name||'Страница')+'</b> · <a href="'+esc(r.url)+'" target="_blank" rel="noopener noreferrer">'+esc(r.url)+'</a>'+
    (r.listed?'':' <span class="warn">(вече не е в списъка)</span>')+
    r.reports.map(x=>'<div class="muted">⚑ '+esc(x.reason)+' · '+new Date(x.at).toLocaleString('bg-BG')+(x.note?' — '+esc(x.note):'')+'</div>').join('')+
+   (r.listed?'<div class="row"><select class="fl">'+FLAGS.map(f=>'<option'+(f===r.flag?' selected':'')+' value="'+esc(f)+'">'+esc(f||'— без етикет —')+'</option>').join('')+
+     (r.flag&&!FLAGS.includes(r.flag)?'<option selected value="'+esc(r.flag)+'">'+esc(r.flag)+'</option>':'')+'</select>'+
+     '<input class="nt" placeholder="Публична бележка към страницата" value="'+esc(r.note)+'"><button class="ok" data-a="mark">Маркирай</button></div>':'')+
    '<div class="row"><button class="ok" data-a="dismiss">Премахни сигнала</button>'+
    (r.listed?'<button class="no" data-a="removepage" data-confirm="1">Махни страницата от сайта</button>':'')+
    '<span class="muted st"></span></div></div>').join(''):'<div class="card muted">Няма сигнали.</div>';
@@ -346,7 +375,7 @@ app.addEventListener('click',async e=>{
   const c=b.closest('.card'), st=c.querySelector('.st'), nm=c.querySelector('.nm'), ou=c.querySelector('.ou');
   c.querySelectorAll('button').forEach(x=>x.disabled=true); st.textContent='…';
   const r=await fetch('/admin/api/'+b.dataset.a,{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},
-    body:JSON.stringify({id:c.dataset.id,name:nm?nm.value:'',outlet:ou?ou.value:''})});
+    body:JSON.stringify({id:c.dataset.id,name:nm?nm.value:'',outlet:ou?ou.value:'',flag:c.querySelector('.fl')?.value||'',note:c.querySelector('.nt')?.value||''})});
   const d=await r.json().catch(()=>({}));
   if(d.ok){load()}
   else{st.textContent=d.error||'Грешка';c.querySelectorAll('button').forEach(x=>x.disabled=false)}

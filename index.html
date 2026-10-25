@@ -27,7 +27,7 @@ input{flex:1;min-width:180px}
 .page{border-top:1px solid var(--line);padding:10px 0 4px;margin-top:10px}
 .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .badge{font-size:.75rem;font-weight:600;padding:2px 9px;border-radius:999px;color:#fff;white-space:nowrap}
-.b-up{background:var(--up)}.b-down{background:var(--down)}.b-unknown{background:var(--unk)}
+.b-up{background:var(--up)}.b-flag{background:#c98a1a}.b-down{background:var(--down)}.b-unknown{background:var(--unk)}
 a{color:var(--accent);word-break:break-all}
 .bars{display:flex;gap:2px;margin-top:6px;height:16px}
 .bars i{flex:1;max-width:7px;border-radius:2px;background:var(--unk);opacity:.6}
@@ -40,6 +40,7 @@ a{color:var(--accent);word-break:break-all}
 .ava.up{box-shadow:0 0 0 2px var(--up)}.ava.down{box-shadow:0 0 0 2px var(--down)}.ava.down img{filter:grayscale(1);opacity:.6}
 .ava img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pinfo{flex:1;min-width:0}
+.pnote{color:var(--text);margin-top:4px;padding:6px 10px;border-left:3px solid #c98a1a;background:rgba(201,138,26,.1);border-radius:4px}
 .rep{flex:none;align-self:flex-start;font:inherit;font-size:.78rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
 .rep:hover{border-color:var(--down);color:var(--down)}
 dialog select{width:100%}
@@ -135,13 +136,14 @@ function render(){
             <div class="pinfo">
               <div class="row"><a class="pname" href="${esc(p.url)}" target="_blank" rel="noopener" title="${esc(p.url)}">${esc(p.name||s.lastTitle||'Страница без име')}</a>
                 <span class="badge b-${s.state}">${LABEL[s.state]||s.state}</span>
+                ${p.flag?`<span class="badge b-flag">⚠ ${esc(p.flag)}</span>`:''}
                 <a class="meta" href="https://web.archive.org/web/*/${esc(p.url)}" target="_blank" rel="noopener">архив</a></div>
           <div class="meta">
             ${p.added?`добавена ${esc(p.added)} · `:''}
             ${s.state==='down'&&s.downSince?`недостъпна от ${fmt(s.downSince)} (${dur(s.downSince)}) · `:''}
             ${s.lastUp?`последно активна ${fmt(s.lastUp)} · `:''}
             ${s.lastChecked?`проверена ${fmt(s.lastChecked)}`:'още не е проверена'}
-            ${p.note?`<br>${esc(p.note)}`:''}
+            ${p.note?`<div class="pnote">${esc(p.note)}</div>`:''}
           </div></div>
             ${SUGGEST_API?`<button type="button" class="rep" data-url="${esc(p.url)}" data-name="${esc(p.name||s.lastTitle||'')}" onclick="openReport(this)" title="Сигнализирай за проблем">⚑ Сигнал</button>`:''}</div>
           ${bars.length?`<div class="bars" title="последни проверки">${bars.map(([t,v])=>`<i class="${v}" title="${fmt(t)}: ${LABEL[v]}"></i>`).join('')}</div>`:''}
