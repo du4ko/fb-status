@@ -21,5 +21,15 @@ jobs:
         run: |
           git config user.name "status-bot"
           git config user.email "status-bot@users.noreply.github.com"
-          git add data/
-          git diff --cached --quiet || (git commit -m "Статус $(date -u +%FT%TZ)" && git pull --rebase && git push)
+          cp -r data "$RUNNER_TEMP/data"
+          for i in 1 2 3; do
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            rm -rf data && cp -r "$RUNNER_TEMP/data" data
+            git add data/
+            if git diff --cached --quiet; then echo "Няма промени"; exit 0; fi
+            git commit -qm "Статус $(date -u +%FT%TZ)"
+            if git push -q origin HEAD:main; then exit 0; fi
+            echo "Push неуспешен, нов опит ($i)"; sleep 5
+          done
+          exit 1
