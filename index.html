@@ -37,7 +37,11 @@ a{color:var(--accent);word-break:break-all}
 .events h3{margin:0 0 8px;font-size:1rem}
 .ev{font-size:.85rem;padding:7px 0;border-top:1px solid var(--line)}
 .pname{font-weight:600;text-decoration:none}.pname:hover{text-decoration:underline}
-.url{color:var(--muted);font-size:.78rem;word-break:break-all;margin:2px 0 2px}
+.ava{position:relative;flex:none;width:48px;height:48px;border-radius:50%;overflow:hidden;background:var(--line);display:grid;place-items:center;font-weight:700;color:var(--muted);text-decoration:none;box-shadow:0 0 0 2px var(--unk)}
+.ava.up{box-shadow:0 0 0 2px var(--up)}.ava.down{box-shadow:0 0 0 2px var(--down)}.ava.down img{filter:grayscale(1);opacity:.6}
+.ava img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pinfo{flex:1;min-width:0}
+.page>.row{align-items:flex-start;flex-wrap:nowrap;gap:12px}
 .empty{color:var(--muted);padding:20px;text-align:center}
 footer{color:var(--muted);font-size:.8rem}
 </style>
@@ -111,17 +115,19 @@ function render(){
       <div class="meta">${esc(o.description||'')}${o.description?' · ':''}${o.pages.length} страници, ${removed} недостъпни</div>
       ${o.pages.map(p=>{const s=st(p.url);const bars=(s.history||[]).slice(-60);
         return `<div class="page">
-          <div class="row"><span class="badge b-${s.state}">${LABEL[s.state]||s.state}</span>
-            <a class="pname" href="${esc(p.url)}" target="_blank" rel="noopener" title="${esc(p.url)}">${esc(p.name||s.lastTitle||'Страница без име')}</a>
-            <a class="meta" href="https://web.archive.org/web/*/${esc(p.url)}" target="_blank" rel="noopener">архив</a></div>
-          <div class="url">${esc(p.url.replace(/^https?:\/\/(www\.)?/,''))}</div>
+          <div class="row">
+            <a href="${esc(p.url)}" target="_blank" rel="noopener" class="ava ${s.state}">${(p.avatar||s.avatar)?`<img src="${esc(p.avatar||s.avatar)}" alt="" loading="lazy" onerror="this.remove()">`:''}<span>${esc((p.name||s.lastTitle||'?').trim().charAt(0).toUpperCase())}</span></a>
+            <div class="pinfo">
+              <div class="row"><a class="pname" href="${esc(p.url)}" target="_blank" rel="noopener" title="${esc(p.url)}">${esc(p.name||s.lastTitle||'Страница без име')}</a>
+                <span class="badge b-${s.state}">${LABEL[s.state]||s.state}</span>
+                <a class="meta" href="https://web.archive.org/web/*/${esc(p.url)}" target="_blank" rel="noopener">архив</a></div>
           <div class="meta">
             ${p.added?`добавена ${esc(p.added)} · `:''}
             ${s.state==='down'&&s.downSince?`недостъпна от ${fmt(s.downSince)} (${dur(s.downSince)}) · `:''}
             ${s.lastUp?`последно активна ${fmt(s.lastUp)} · `:''}
             ${s.lastReason?esc(s.lastReason):'още не е проверена'}
             ${p.note?`<br>${esc(p.note)}`:''}
-          </div>
+          </div></div></div>
           ${bars.length?`<div class="bars" title="последни проверки">${bars.map(([t,v])=>`<i class="${v}" title="${fmt(t)}: ${LABEL[v]}"></i>`).join('')}</div>`:''}
         </div>`}).join('')}
     </article>`}).join(''):'<div class="empty">Няма резултати.</div>';

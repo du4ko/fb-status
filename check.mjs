@@ -3,6 +3,7 @@
 // Изисква Node 20+ (вграден fetch), без външни зависимости.
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
+import crypto from 'node:crypto';
 
 const CONFIG = 'pages.json';
 const STATUS = 'data/status.json';
@@ -10,6 +11,8 @@ const EVENTS = 'data/events.json';
 const HISTORY_LEN = 200;      // колко проверки пазим на страница
 const DOWN_CONFIRM = 2;       // поредни "недостъпна" преди да сменим статуса (против фалшиви тревоги)
 const MAX_EVENTS = 1000;
+const AVATAR_DIR = 'data/avatars';
+const AVATAR_MAX_AGE = 24 * 3600 * 1000; // обновяваме снимката веднъж на ден
 const UA = 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)';
 
 const DOWN_TITLES = [
@@ -41,7 +44,7 @@ function meta(html, prop) {
 export function classify({ status, finalUrl, html }) {
   const title = ((html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '').trim();
   const ogTitle = meta(html, 'og:title');
-  const base = { http: status, title: decode(ogTitle || title) };
+  const base = { http: status, title: decode(ogTitle || title), image: decode(meta(html, 'og:image')) };
 
   if (status === 404 || status === 410) return { ...base, state: 'down', reason: `HTTP ${status}` };
   if (DOWN_TITLES.some(r => r.test(title) || r.test(ogTitle)))
@@ -65,6 +68,21 @@ async function probe(url) {
   } catch (e) {
     return { state: 'unknown', reason: 'мрежова грешка: ' + e.message };
   }
+}
+
+async function saveAvatar(pageUrl, imgUrl) {
+  try {
+    const res = await fetch(imgUrl, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(20000) });
+    const type = res.headers.get('content-type') || '';
+    if (!res.ok || !type.startsWith('image/')) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (buf.length < 500 || buf.length > 2_000_000) return null;
+    const ext = type.includes('png') ? 'png' : type.includes('webp') ? 'webp' : 'jpg';
+    const name = crypto.createHash('sha1').update(pageUrl).digest('hex').slice(0, 12) + '.' + ext;
+    await fs.mkdir(AVATAR_DIR, { recursive: true });
+    await fs.writeFile(`${AVATAR_DIR}/${name}`, buf);
+    return `${AVATAR_DIR}/${name}`;
+  } catch { return null; }
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -95,6 +113,12 @@ async function main() {
       rec.lastReason = result.reason;
       if (result.http) rec.lastHttp = result.http;
       if (result.title) rec.lastTitle = result.title;
+
+      if (result.state === 'up' && result.image &&
+          (!rec.avatar || Date.now() - new Date(rec.avatarAt || 0) > AVATAR_MAX_AGE)) {
+        const saved = await saveAvatar(url, result.image);
+        if (saved) { rec.avatar = saved; rec.avatarAt = now; }
+      }
 
       if (result.state === 'up') {
         rec.consecutiveDown = 0;
