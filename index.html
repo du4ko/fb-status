@@ -50,6 +50,7 @@ a{color:var(--accent);word-break:break-all}
 .info summary::-webkit-details-marker{display:none}
 .info summary:hover{color:var(--text)}
 .info[open]>div{position:absolute;z-index:5;left:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:max-content;max-width:min(320px,80vw);box-shadow:0 4px 16px rgba(0,0,0,.35)}
+.pinfo-note{color:var(--muted);margin-top:6px;padding:6px 10px;border:1px solid var(--line);border-left-width:4px;background:rgba(255,255,255,.04);border-radius:6px;font-size:.88rem}
 .down-since{color:var(--down)}
 .rep{flex:none;align-self:flex-start;font:inherit;font-size:.78rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
 .rep:hover{border-color:var(--down);color:var(--down)}
@@ -154,6 +155,7 @@ function render(){
                   ${s.lastChecked?`проверена ${fmt(s.lastChecked)}`:'още не е проверена'}
                 </div></details></div>
           ${s.state==='down'&&s.downSince?`<div class="meta down-since">недостъпна от ${fmt(s.downSince)} (${dur(s.downSince)})</div>`:''}
+          ${p.info?`<div class="pinfo-note">${esc(p.info)}</div>`:''}
           ${p.note?`<div class="pnote">${esc(p.note)}</div>`:''}
           </div>
             ${SUGGEST_API?`<button type="button" class="rep" data-url="${esc(p.url)}" data-name="${esc(p.name||s.lastTitle||'')}" onclick="openReport(this)" title="Сигнализирай за проблем">⚑ Сигнал</button>`:''}</div>
