@@ -225,6 +225,17 @@
           "avatar": "avatars/michelle.jpg"
         }
       ]
+    },
+    {
+      "id": "visoko-naprezhenie",
+      "name": "Високо Напрежение",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/v.naprejenie",
+          "added": "2026-10-28",
+          "name": "Високо Напрежение"
+        }
+      ]
     }
   ]
 }
