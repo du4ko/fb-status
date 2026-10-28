@@ -236,6 +236,17 @@
           "name": "Високо Напрежение"
         }
       ]
+    },
+    {
+      "id": "dnevna-doza-klasicheska-mayna",
+      "name": "Дневна доза \"Класическа Майна\"",
+      "pages": [
+        {
+          "url": "https://www.facebook.com/dozaklasicheskamaina",
+          "added": "2026-10-28",
+          "name": "Дневна доза \"Класическа Майна\""
+        }
+      ]
     }
   ]
 }
